@@ -58,8 +58,11 @@ class BaseModel:
             '__class__': self.__class__.__name__,
         }
 
-        if hasattr(self, '_sa_instance_state'):
+        # if hasattr(self, '_sa_instance_state'):
+        #    del new_dict['_sa_instance_state']
+        if '_sa_instance_state' in new_dict:
             del new_dict['_sa_instance_state']
+
         return new_dict
 
     def delete(self):
