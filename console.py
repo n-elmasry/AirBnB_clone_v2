@@ -148,8 +148,9 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
 
             # task 7 ends here
+    """
     def do_update(self, args):
-        '''Update Console instance'''
+        #'''Update Console instance'''
         if not args:
             print('** class name missing **')
         else:
@@ -169,6 +170,33 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     setattr(instances[key], split(args)[2], split(args)[3])
                     instances[key].save()
+    """
+
+    def do_update(self, args):
+        '''Update Console instance'''
+        if not args:
+            print('** class name missing **')
+        else:
+            split_args = split(args)
+            if split_args[0] not in self.clsz:
+                print("** class doesn't exist **")
+            elif len(split_args) < 2:
+                print('** instance id missing **')
+            else:
+                key = "{}.{}".format(split_args[0], split_args[1])
+                instances = storage.all()
+                if key not in instances:
+                    print('** no instance found **')
+                elif len(split_args) < 3:
+                    print('** attribute name missing **')
+                elif len(split_args) < 4:
+                    print('** value missing **')
+                else:
+                    setattr(instances[key], split_args[2], split_args[3])
+                    try:
+                        instances[key].save()
+                    except Exception as e:
+                        print(f"Error updating instance: {str(e)}")
 
 
 if __name__ == '__main__':
