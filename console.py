@@ -112,25 +112,25 @@ class HBNBCommand(cmd.Cmd):
                 storage.save()
 
     def do_all(self, args):
-        """Prints all string representation of all instances"""
-        storage.reload()
-        instances = storage.all()
+        """ Shows all objects, or all objects of a class"""
+        print_list = []
 
-        if not args or args.lower() == 'basemodel':
-            result = [instance.__str__() for instance in instances.values()]
-            print(result)
-
-        elif args.split()[0] in HBNBCommand.clsz:
-            result = [
-                instance.__str__()
-                for key, instance in instances.items()
-                if key.split('.')[0] == args.lower()
-            ]
-            print(result)
+        __objects = storage.all()
+        if args:
+            args = args.split(' ')[0]  # remove possible trailing args
+            if args not in HBNBCommand.clsz:
+                print("** class doesn't exist **")
+                return
+            for k, v in __objects.items():
+                if k.split('.')[0] == args:
+                    print_list.append(str(v))
         else:
-            print("** class doesn't exist **")
+            for k, v in __objects.items():
+                print_list.append(str(v))
 
-            # task 7 ends here
+        print(print_list)
+
+        # task 7 ends here
     """
     def do_update(self, args):
         #'''Update Console instance'''
@@ -180,6 +180,22 @@ class HBNBCommand(cmd.Cmd):
                         instances[key].save()
                     except Exception as e:
                         print(f"Error updating instance: {str(e)}")
+
+    @classmethod
+    def verify_attribute(cls, attribute):
+        """
+        Verify if the attribute is correctly formatted
+        """
+        if attribute[0] is attribute[-1] in ['"', "'"]:
+            return attribute.strip('"\'').replace('_', ' ').replace('\\', '"')
+        else:
+            try:
+                try:
+                    return int(attribute)
+                except ValueError:
+                    return float(attribute)
+            except ValueError:
+                return None
 
 
 if __name__ == '__main__':
