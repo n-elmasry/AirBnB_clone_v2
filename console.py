@@ -50,47 +50,29 @@ class HBNBCommand(cmd.Cmd):
 
     # task 7 starts here
 
-    def do_create(self, line):
-        """Usage: create <class> <key 1>=<value 2> <key 2>=<value 2> ...
-        Create a new class instance with given keys/values and print its id.
-        """
+    def do_create(self, args):
+        """ Create an object of any class"""
         try:
-            if not line:
+            if not args:
                 raise SyntaxError()
-
-            class_name, *params = line.split()
-            if class_name not in self.clsz:
-                print("** class doesn't exist **")
-                return
-
-            kwargs = {}
+            split1 = args.split(' ')
+            new_instance = eval('{}()'.format(split1[0]))
+            params = split1[1:]
             for param in params:
-                key, value = param.split("=")
-                if value[0] == '"' and value[-1] == '"':
-                    value = value[1:-1].replace('\\"', '"').replace('_', ' ')
-                elif '.' in value:
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        print(f"Invalid float value: {value}")
-                        continue
-                else:
-                    try:
-                        value = int(value)
-                    except ValueError:
-                        print(f"Invalid integer value: {value}")
-                        continue
-                kwargs[key] = value
-
-            obj = eval(class_name)(**kwargs)
-            storage.new(obj)
-            print(obj.id)
-            obj.save()
-
+                k, v = param.split('=')
+                try:
+                    attribute = HBNBCommand.verify_attribute(v)
+                except:
+                    continue
+                if not attribute:
+                    continue
+                setattr(new_instance, k, attribute)
+            new_instance.save()
+            print(new_instance.id)
         except SyntaxError:
             print("** class name missing **")
-        except Exception as e:
-            print(f"Error: {str(e)}")
+        except NameError as e:
+            print("** class doesn't exist **")
 
     def do_show(self, args):
         """Prints str representation of instance based on class name and id"""
