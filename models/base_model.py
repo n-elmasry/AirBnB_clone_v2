@@ -3,10 +3,19 @@
 import uuid
 from datetime import datetime
 import models
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.types import DateTime
+
+Base = declarative_base()
 
 
 class BaseModel:
     """Class BaseModel"""
+    id = Column(String(60), nullable=False, primary_key=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
+    updated_at = Column(DateTime,  default=datetime.utcnow(), nullable=False)
 
     def __init__(self, *args, **kwargs):
         '''Re-create an instance with this dictionary representatioin'''
@@ -24,7 +33,7 @@ class BaseModel:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            models.storage.new(self)
+            # models.storage.new(self)
             # models.storage.save()
 
     def __str__(self):
@@ -36,6 +45,7 @@ class BaseModel:
     def save(self):
         """" updates updated_at with the current datetime"""
         self.updated_at = datetime.now()
+        models.storage.new(self)
         models.storage.save()
 
     def to_dict(self):
@@ -47,4 +57,11 @@ class BaseModel:
             'my_number': getattr(self, 'my_number', 0),
             '__class__': self.__class__.__name__,
         }
+
+        if hasattr(self, '_sa_instance_state'):
+            del new_dict['_sa_instance_state']
         return new_dict
+
+    def delete(self):
+        """ delete the current instance from the storage"""
+        models.storage.delete(self)

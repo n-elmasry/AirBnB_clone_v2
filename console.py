@@ -49,39 +49,47 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     # task 7 starts here
-    def do_create(self, args):
-        """ Create an object of any class"""
-        # split arguments by space to get class name and parameters
-        args = args.split()
-        # check if class name is missing or not in list of available classes
-        if not args:
+    def do_create(self, line):
+        """Usage: create <class> <key 1>=<value 2> <key 2>=<value 2> ...
+        Create a new class instance with given keys/values and print its id.
+        """
+        try:
+            if not line:
+                raise SyntaxError()
+
+            class_name, *params = line.split()
+            if class_name not in self.clsz:
+                print("** class doesn't exist **")
+                return
+
+            kwargs = {}
+            for param in params:
+                key, value = param.split("=")
+                if value[0] == '"' and value[-1] == '"':
+                    value = value[1:-1].replace('\\"', '"').replace('_', ' ')
+                elif '.' in value:
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        print(f"Invalid float value: {value}")
+                        continue
+                else:
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        print(f"Invalid integer value: {value}")
+                        continue
+                kwargs[key] = value
+
+            obj = eval(class_name)(**kwargs)
+            storage.new(obj)
+            print(obj.id)
+            obj.save()
+
+        except SyntaxError:
             print("** class name missing **")
-            return
-        class_name = args[0]
-        if class_name not in HBNBCommand.clsz:
-            print("** class doesn't exist **")
-            return
-
-        # Extract parameters in the format key=value
-        params = {}
-        for arg in args[1:]:
-            if '=' not in arg:
-                print(f"Skipping invalid parameter: {arg}")
-                continue
-            key, value = arg.split('=', 1)
-            # Remove quotes and replace underscores with spaces in value
-            value = value.strip('"').replace('_', ' ')
-            params[key] = value
-
-        # Dynamically get the class based on its name
-        cls = getattr(models, class_name)
-
-        # Create an instance of the class with the provided parameters
-        new_instance = cls(**params)
-
-        # Save the new instance
-        new_instance.save()
-        print(new_instance.id)
+        except Exception as e:
+            print(f"Error: {str(e)}")
 
     def do_show(self, args):
         """Prints str representation of instance based on class name and id"""
