@@ -117,7 +117,7 @@ class HBNBCommand(cmd.Cmd):
 
         __objects = storage.all()
         if args:
-            args = args.split(' ')[0]  # remove possible trailing args
+            args = args.split(' ')[0]
             if args not in HBNBCommand.clsz:
                 print("** class doesn't exist **")
                 return
@@ -183,9 +183,7 @@ class HBNBCommand(cmd.Cmd):
 
     @classmethod
     def verify_attribute(cls, attribute):
-        """
-        Verify if the attribute is correctly formatted
-        """
+        """ Verify if the attribute is correct """
         if attribute[0] is attribute[-1] in ['"', "'"]:
             return attribute.strip('"\'').replace('_', ' ').replace('\\', '"')
         else:
