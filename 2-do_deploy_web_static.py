@@ -1,31 +1,45 @@
 #!/usr/bin/python3
 """Fabric script that distributes an archive to your web servers"""
-from fabric.contrib import files
-from fabric.api import env, put, run
-import os
 
-env.hosts = ['100.26.153.239', '3.90.82.110']
+from fabric.api import put, run, env
+from os import path
+
+
+env.hosts = ['52.3.220.66', '100.26.232.118']
+env.user = 'ubuntu'
+env.key_filename = '~/.ssh/school'
 
 
 def do_deploy(archive_path):
-    """distributes an archive to your web servers"""
-    if not os.path.exists(archive_path):
-        return False
-
-    data_path = '/data/web_static/releases/'
-    tmp = archive_path.split('.')[0]
-    name = tmp.split('/')[1]
-    destination = data_path + name
-
+    """Distribute an archive to your web servers"""
     try:
-        put(archive_path, '/tmp')
-        run('sudo mkdir -p {}'.format(destination))
-        run(f'sudo tar -xzf /tmp/{name}.tgz -C {destination}')
-        run(f'sudo rm -f /tmp/{name}.tgz')
-        run(f'sudo mv {destination}/web_static/* {destination}/')
-        run(f'sudo rm -rf {destination}/web_static')
-        run(f'sudo rm -rf /data/web_static/current')
-        run(f'sudo ln -s {destination} /data/web_static/current')
+
+        if path.exists(archive_path) is False:
+            return False
+        put(archive_path, '/tmp/')
+
+        archive_name = archive_path.split('/')[-1]
+        foldername = archive_name.split('.')[0]
+
+        run("sudo mkdir -p /data/web_static/releases/{}/".format(foldername))
+
+        run("sudo tar -xzf /tmp/{} -C /data/web_static/releases/{}/".format(
+            archive_name, foldername))
+
+        run("sudo rm /tmp/{}".format(archive_name))
+
+        run("sudo mv /data/web_static/releases/{}/web_static/* \
+            /data/web_static/releases/{}/".format(foldername, foldername))
+
+        run("sudo rm -rf /data/web_static/releases/{}/web_static"
+            .format(foldername))
+
+        run("sudo rm -rf /data/web_static/current")
+
+        run("sudo ln -s /data/web_static/releases/{}/ \
+            /data/web_static/current".format(foldername))
+        print("New version deployed!")
+
         return True
     except Exception as e:
         return False
