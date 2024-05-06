@@ -11,14 +11,21 @@ env.key_filename = '~/.ssh/school'
 
 
 def do_pack():
-    """generates a .tgz archive """
+    """generates a .tgz archive f"""
+
     local("mkdir -p versions")
-    time_now = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_path = "versions/web_static_{}.tgz".format(time_now)
-    result = local("tar -czf {} web_static/".format(file_path))
-    if result.failed:
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+
+    archive_name = "web_static_{}.tgz".format(
+        now
+    )
+
+    try:
+
+        local("tar -czvf versions/{} web_static".format(archive_name))
+        return "versions/{}".format(archive_name)
+    except Exception as e:
         return None
-    return (file_path)
 
 
 def do_deploy(archive_path):
