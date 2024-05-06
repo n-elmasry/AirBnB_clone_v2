@@ -1,31 +1,42 @@
 #!/usr/bin/python3
-"""creates and distributes an archive to your web servers"""
+"""Fabric script that creates and distributes an archive to your web server"""
 from fabric.api import put, run, local, env
 from datetime import datetime
 from os import path
+archive_path = None
 
 
-env.hosts = ['100.26.153.239', '3.90.82.110']
+env.hosts = ['52.3.220.66', '100.26.232.118']
 env.user = 'ubuntu'
-env.key_filename = '~/.ssh/school'
+env.key_filename = '~/.ssh/id_rsa'
 
 
 def do_pack():
     """generates a .tgz archive """
+
     local("mkdir -p versions")
-    time_now = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_path = "versions/web_static_{}.tgz".format(time_now)
-    result = local("tar -czf {} web_static/".format(file_path))
-    if result.failed:
+
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+
+    archive_name = "web_static_{}.tgz".format(
+        now
+    )
+
+    try:
+
+        local("tar -czvf versions/{} web_static".format(archive_name))
+
+        return "versions/{}".format(archive_name)
+    except Exception as e:
         return None
-    return (file_path)
 
 
 def do_deploy(archive_path):
     """Distribute an archive to your web servers"""
+
     try:
 
-        if path.exists(archive_path) is False:
+        if not path.exists(archive_path):
             return False
         put(archive_path, '/tmp/')
 
@@ -44,7 +55,6 @@ def do_deploy(archive_path):
 
         run("sudo rm -rf /data/web_static/releases/{}/web_static"
             .format(foldername))
-
         run("sudo rm -rf /data/web_static/current")
 
         run("sudo ln -s /data/web_static/releases/{}/ \
@@ -56,9 +66,10 @@ def do_deploy(archive_path):
 
 
 def deploy():
-    """creates and distributes an archive to your web servers"""
-    archive_path = do_pack()
-
+    """ creates and distributes an archive to your web server"""
+    global archive_path
     if archive_path is None:
-        return False
+        archive_path = do_pack()
+        if archive_path is None:
+            return False
     return do_deploy(archive_path)
