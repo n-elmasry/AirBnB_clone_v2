@@ -3,7 +3,7 @@
 from fabric.api import put, run, local, env
 from datetime import datetime
 from os import path
-archive_path = None
+
 
 env.hosts = ['100.26.153.239', '3.90.82.110']
 env.user = 'ubuntu'
@@ -11,21 +11,14 @@ env.key_filename = '~/.ssh/school'
 
 
 def do_pack():
-    """generates a .tgz archive f"""
-
+    """generates a .tgz archive """
     local("mkdir -p versions")
-    now = datetime.now().strftime("%Y%m%d%H%M%S")
-
-    archive_name = "web_static_{}.tgz".format(
-        now
-    )
-
-    try:
-
-        local("tar -czvf versions/{} web_static".format(archive_name))
-        return "versions/{}".format(archive_name)
-    except Exception as e:
+    time_now = datetime.now().strftime("%Y%m%d%H%M%S")
+    file_path = "versions/web_static_{}.tgz".format(time_now)
+    result = local("tar -czf {} web_static/".format(file_path))
+    if result.failed:
         return None
+    return (file_path)
 
 
 def do_deploy(archive_path):
@@ -64,9 +57,8 @@ def do_deploy(archive_path):
 
 def deploy():
     """creates and distributes an archive to your web servers"""
-    global archive_path
+    archive_path = do_pack()
+
     if archive_path is None:
-        archive_path = do_pack()
-        if archive_path is None:
-            return False
+        return False
     return do_deploy(archive_path)
