@@ -14,31 +14,29 @@ class BaseModel:
     """Class BaseModel"""
     id = Column(String(60), nullable=False, primary_key=True)
 
-    created_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
-    updated_at = Column(DateTime,  default=datetime.utcnow(), nullable=False)
+    created_at = Column(DateTime, default=datetime.now(), nullable=False)
+    # updated_at = Column(DateTime,  default=datetime.utcnow(), nullable=False)
+    updated_at = Column(DateTime, default=datetime.now, nullable=False)
 
     def __init__(self, *args, **kwargs):
         '''Re-create an instance with this dictionary representatioin'''
         # instance attribute
-        date_time = "%Y-%m-%dT%H:%M:%S.%f"
-        if len(kwargs) != 0:
+        if kwargs:
             for key, value in kwargs.items():
                 if key == "__class__":
                     continue
                 elif key in ['created_at', 'updated_at']:
-                    setattr(self, key, datetime.strptime(value, date_time))
+                    setattr(self, key, datetime.strptime(
+                        value, "%Y-%m-%dT%H:%M:%S.%f"))
                 else:
                     setattr(self, key, value)
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            # self.__dict__.update(kwargs)
-            # models.storage.new(self)
-            # models.storage.save()
 
     def __str__(self):
-        # return f"{type(self).__name__} {self.to_dict()}"
+        """method"""
         return f'[{self.__class__.__name__}] ({self.id}) {self.__dict__}'
 
     # Public instance methods
