@@ -22,7 +22,6 @@ class State(BaseModel, Base):
             """_summary_
             """
             from models import storage
-            from models.city import City
             cities_list = []
             for city in storage.all(City).values():
                 if city.state_id == self.id:
