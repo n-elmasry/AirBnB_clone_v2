@@ -15,8 +15,7 @@ class BaseModel:
     id = Column(String(60), nullable=False, primary_key=True)
 
     created_at = Column(DateTime, default=datetime.now(), nullable=False)
-    # updated_at = Column(DateTime,  default=datetime.utcnow(), nullable=False)
-    updated_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(DateTime, default=datetime.now(), nullable=False)
 
     def __init__(self, *args, **kwargs):
         '''Re-create an instance with this dictionary representatioin'''
@@ -58,8 +57,6 @@ class BaseModel:
             '__class__': self.__class__.__name__,
         }
 
-        # if hasattr(self, '_sa_instance_state'):
-        #    del new_dict['_sa_instance_state']
         if '_sa_instance_state' in new_dict:
             del new_dict['_sa_instance_state']
 
