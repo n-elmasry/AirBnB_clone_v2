@@ -1,4 +1,4 @@
-#!/usr/tmp/python3
+#!/usr/bin/python3
 """starts a Flask web application"""
 from flask import Flask, render_template, request
 from models import storage
