@@ -36,16 +36,10 @@ def states():
 @app.route("/states/<id>", strict_slashes=False)
 def statesid(id=None):
     """displayes city id"""
-    all_states = list(storage.all(State).values())
-    if (id is None):
-        sorted_states = sorted(all_states, key=attrgetter('name'))
-        return render_template("9-states.html", states=sorted_states, id=id)
-    for state in all_states:
+    for state in storage.all("State").values():
         if state.id == id:
-            return render_template('9-states.html',
-                                   state=state, id=id)
-    return render_template('9-states.html',
-                           state=None, id=id)
+            return render_template("9-states.html", state=state)
+    return render_template("9-states.html")
 
 
 @app.teardown_appcontext
