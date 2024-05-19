@@ -17,9 +17,17 @@ def state_list():
     return render_template("7-states_list.html", states=sorted_states)
 
 
+@app.route("/cities_by_states", strict_slashes=False)
+def cities_by_states():
+    """display thec itites"""
+    all_states = list(storage.all(State).values())
+    sorted_states = sorted(all_states, key=attrgetter('name'))
+    return render_template("8-cities_by_states.html", states=sorted_states)
+
+
 @app.teardown_appcontext
 def teardown_db(self):
-    """call close method"""
+    """clls close method"""
     storage.close()
 
 
