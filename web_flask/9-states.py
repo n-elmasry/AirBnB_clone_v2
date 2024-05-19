@@ -9,32 +9,16 @@ from operator import attrgetter
 app = Flask(__name__)
 
 
-@app.route("/states_list", strict_slashes=False)
-def state_list():
-    """display the states"""
-    all_states = list(storage.all(State).values())
-    sorted_states = sorted(all_states, key=attrgetter('name'))
-    return render_template("7-states_list.html", states=sorted_states)
-
-
-@app.route("/cities_by_states", strict_slashes=False)
-def cities_by_states():
-    """display thec citites"""
-    all_states = list(storage.all(State).values())
-    sorted_states = sorted(all_states, key=attrgetter('name'))
-    return render_template("8-cities_by_states.html", states=sorted_states)
-
-
 @app.route("/states", strict_slashes=False)
 def states():
     """display states"""
-    all_states = list(storage.all(State).values())
-    sorted_states = sorted(all_states, key=attrgetter('name'))
+    all_states = storage.all(State).values()
+    sorted_states = sorted(all_states, key=lambda x: x.name)
     return render_template("9-states.html", states=sorted_states)
 
 
 @app.route("/states/<id>", strict_slashes=False)
-def statesid(id=None):
+def statesid(id):
     """displayes city id"""
     for state in storage.all("State").values():
         if state.id == id:
